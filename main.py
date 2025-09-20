@@ -66,7 +66,7 @@ def generate_next_states(node, tree):
         if distance > tree.path_size:
             print_debug(f"Level: {distance}")
             tree.path_size = distance
-            print_debug(f"Frontier size: {len(tree.frontier_states)}")
+            print_debug(f"Frontier size: {tree.frontier_states.size}")
             print_debug(f"Visited size: {len(tree.visited_states)}")
 
     for direction in directions_column:
@@ -86,10 +86,42 @@ def check_final_state(state):
     return state == [1, 2, 3, 4, 5, 6, 7, 8, 0]
 
 
+class OrderedNodeList:
+    def __init__(self):
+        self.buckets = {}
+        self.keys = []
+        self.max_key = None
+        self.size = 0
+
+    def add(self, node):
+        key = node.heuristic
+        if key not in self.buckets:
+            self.keys.append(key)
+            self.buckets[key] = []
+
+        if not self.max_key or key > self.max_key:
+            self.max_key = key
+
+        self.buckets[key].append(node)
+        self.size += 1
+
+    def pop(self):
+        if not self.buckets:
+            raise IndexError("pop from empty OrderedNodeList")
+        node = self.buckets[self.max_key].pop(0)
+        self.size -= 1
+        if not self.buckets[self.max_key]:
+            del self.buckets[self.max_key]
+            self.keys.remove(self.max_key)
+            self.max_key = max(self.keys) if self.keys else None
+        return node
+
+
 class Tree:
     def __init__(self, root):
         self.root = root
-        self.frontier_states = [root]
+        self.frontier_states = OrderedNodeList()
+        self.frontier_states.add(root)
         self.visited_states = set()
         self.path_size = 0
 
@@ -112,7 +144,7 @@ def execute():
 
     try:
         while True:
-            node = tree.frontier_states.pop(0)
+            node = tree.frontier_states.pop()
 
             if check_final_state(node.state):
                 print_debug("Final Puzzle:")
@@ -127,7 +159,7 @@ def execute():
                 if not tree.already_visited(next_node.state):
                     generated_nodes_count += 1
                     # TODO: ordenado por heuristica
-                    tree.frontier_states.append(next_node)
+                    tree.frontier_states.add(next_node)
 
             tree.visited_states.add(tuple(node.state))
 
@@ -136,7 +168,7 @@ def execute():
 
     end_time = datetime.datetime.now()
     print_debug(f"Execution Time: {end_time - start_time}")
-    print_debug(f"Frontier size: {len(tree.frontier_states)}")
+    print_debug(f"Frontier size: {tree.frontier_states.size}")
     print_debug(f"Visited size: {len(tree.visited_states)}")
     print_debug(f"Nodes generated: {generated_nodes_count}")
 
@@ -159,4 +191,4 @@ def benchmark(runs, seed=42):
 
 
 if __name__ == "__main__":
-    benchmark(runs=10)
+    benchmark(runs=5)
