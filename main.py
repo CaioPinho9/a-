@@ -2,7 +2,9 @@ import datetime
 import random
 import statistics
 
-debug = False
+debug = True
+
+MAX_DISTANCE = 362880
 
 
 class Node:
@@ -63,11 +65,11 @@ def generate_next_states(node, tree):
         new_puzzle[zero_pos], new_puzzle[new] = puzzle[new], puzzle[zero_pos]
         distance = node.distance + 1
         next_states.append(Node(new_puzzle, new, distance, tree.heuristic_function(node), node))
-        if distance > tree.path_size:
-            print_debug(f"Level: {distance}")
-            tree.path_size = distance
-            print_debug(f"Frontier size: {tree.frontier_states.size}")
-            print_debug(f"Visited size: {len(tree.visited_states)}")
+        # if distance > tree.path_size:
+        #     print_debug(f"Level: {distance}")
+        #     tree.path_size = distance
+        #     print_debug(f"Frontier size: {tree.frontier_states.size}")
+        #     print_debug(f"Visited size: {len(tree.visited_states)}")
 
     for direction in directions_column:
         new = zero_pos + direction
@@ -140,7 +142,7 @@ def uniform_cost(node):
 def difference_heuristic(node):
     difference = [-1 for a, b in zip(final_state, node.state) if a != b]
     sum_difference = sum(difference)
-    return 8 + sum_difference
+    return MAX_DISTANCE - node.distance + 8 + sum_difference
 
 
 def unnacceptable_heuristic(node):
@@ -150,7 +152,7 @@ def unnacceptable_heuristic(node):
         state_value = state[i]
         final_index = final_state.index(state_value)
         sum_value += (abs(i % 3 - final_index % 3) + abs(i // 3 - final_index // 3))
-    return sum_value
+    return MAX_DISTANCE - node.distance + sum_value
 
 
 def inversion_heuristic(node):
@@ -160,7 +162,7 @@ def inversion_heuristic(node):
         for j in range(i + 1, len(state)):
             if state[i] != 0 and state[j] != 0 and state[i] > state[j]:
                 inversions += 1
-    return 28 - inversions
+    return MAX_DISTANCE - node.distance - inversions
 
 
 def print_tree(node):
@@ -182,27 +184,36 @@ def save_txts(tree):
             f.write(f"{list(state)}\n")
 
 
-def execute():
+examples = [
+    [6, 1, 4, 0, 8, 5, 7, 3, 2]
+]
+
+heuristics = [
+    uniform_cost,
+    difference_heuristic,
+    unnacceptable_heuristic,
+    inversion_heuristic
+]
+
+
+def execute(initial_value, heuristic):
     start_time = datetime.datetime.now()
     end_time = None
 
-    state = generate_random_puzzle()
+    state = initial_value
     zero_pos = state.index(0)
     node = Node(state, zero_pos)
 
     print_debug("Initial Puzzle:")
     print_puzzle(node.state)
 
-    tree = Tree(node, inversion_heuristic)
+    tree = Tree(node, heuristic)
 
     try:
         while True:
             node = tree.frontier_states.pop()
 
             if check_final_state(node.state):
-                print_debug("Final Puzzle:")
-                print_puzzle(node.state)
-
                 print(f"O tamanho do caminho: {node.distance}")
                 end_time = datetime.datetime.now()
                 print(f"Tempo de execução (em segundos): {end_time - start_time}")
@@ -211,7 +222,7 @@ def execute():
 
                 save_txts(tree)
 
-                print_tree(node)
+                # print_tree(node)
                 break
 
             generate_next_states(node, tree)
@@ -229,11 +240,13 @@ def execute():
 
 
 def benchmark(runs, seed=42):
+    initial_value = generate_random_puzzle()
+    heuristic = difference_heuristic
     random.seed(seed)
     times = []
     for i in range(runs):
         print("Run", i + 1)
-        t = execute()
+        t = execute(initial_value, heuristic)
         times.append(t.total_seconds())
         print("-" * 20)
     mean_time = statistics.mean(times)
@@ -245,5 +258,10 @@ def benchmark(runs, seed=42):
 
 
 if __name__ == "__main__":
-    execute()
+    for example in examples:
+        for heuristic in heuristics:
+            print(f"Using heuristic: {heuristic.__name__}")
+            print("Example:", example)
+            execute(example, heuristic)
+            print("=" * 40)
     # benchmark(runs=1000)
