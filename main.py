@@ -1,3 +1,4 @@
+import csv
 import datetime
 import random
 import statistics
@@ -162,7 +163,7 @@ def inversion_heuristic(node):
         for j in range(i + 1, len(state)):
             if state[i] != 0 and state[j] != 0 and state[i] > state[j]:
                 inversions += 1
-    return MAX_DISTANCE - node.distance - inversions
+    return MAX_DISTANCE - node.distance + 28 - inversions
 
 
 def print_tree(node):
@@ -185,7 +186,9 @@ def save_txts(tree):
 
 
 examples = [
-    [6, 1, 4, 0, 8, 5, 7, 3, 2]
+    [1, 8, 5, 7, 4, 6, 0, 3, 2],  # facil
+    [6, 1, 4, 0, 8, 5, 7, 3, 2],  # medio
+    [0, 3, 8, 6, 5, 1, 7, 4, 2],  # dificil
 ]
 
 heuristics = [
@@ -220,7 +223,7 @@ def execute(initial_value, heuristic):
                 print(f"O total de nodos visitados: {len(tree.visited_states)}")
                 print(f"O maior tamanho da fronteira (lista de abertos): {tree.frontier_states.size}")
 
-                save_txts(tree)
+                # save_txts(tree)
 
                 # print_tree(node)
                 break
@@ -240,11 +243,11 @@ def execute(initial_value, heuristic):
 
 
 def benchmark(runs, seed=42):
-    initial_value = generate_random_puzzle()
-    heuristic = difference_heuristic
     random.seed(seed)
+    heuristic = difference_heuristic
     times = []
     for i in range(runs):
+        initial_value = generate_random_puzzle()
         print("Run", i + 1)
         t = execute(initial_value, heuristic)
         times.append(t.total_seconds())
@@ -258,10 +261,23 @@ def benchmark(runs, seed=42):
 
 
 if __name__ == "__main__":
+    rows = []
+
     for example in examples:
         for heuristic in heuristics:
             print(f"Using heuristic: {heuristic.__name__}")
             print("Example:", example)
-            execute(example, heuristic)
+            elapsed = execute(example, heuristic)  # assume this returns duration in seconds
+            rows.append({
+                "heuristic": heuristic.__name__,
+                "example": str(example),
+                "time_seconds": elapsed,
+            })
             print("=" * 40)
-    # benchmark(runs=1000)
+
+    csv_path = "results.csv"
+    with open(csv_path, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=["heuristic", "example", "time_seconds"])
+        writer.writeheader()
+        writer.writerows(rows)
+    # benchmark(runs=50)
