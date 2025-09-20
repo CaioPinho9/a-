@@ -1,5 +1,6 @@
 import datetime
 import random
+import statistics
 
 
 class Node:
@@ -29,7 +30,13 @@ def generate_random_puzzle():
             return puzzle
 
 
+debug = False
+
+
 def print_puzzle(puzzle):
+    if not debug:
+        return
+
     count = 0
     for row in puzzle:
         print(row, end=" ")
@@ -37,6 +44,11 @@ def print_puzzle(puzzle):
         if count % 3 == 0:
             print()
     print()
+
+
+def print_debug(message):
+    if debug:
+        print(message)
 
 
 def generate_next_states(node, tree):
@@ -52,10 +64,10 @@ def generate_next_states(node, tree):
         distance = node.distance + 1
         next_states.append(Node(new_puzzle, new, distance))
         if distance > tree.path_size:
-            print(f"Level: {distance}")
+            print_debug(f"Level: {distance}")
             tree.path_size = distance
-            print(f"Frontier size: {len(tree.frontier_states)}")
-            print(f"Visited size: {len(tree.visited_states)}")
+            print_debug(f"Frontier size: {len(tree.frontier_states)}")
+            print_debug(f"Visited size: {len(tree.visited_states)}")
 
     for direction in directions_column:
         new = zero_pos + direction
@@ -85,7 +97,7 @@ class Tree:
         return tuple(state) in self.visited_states
 
 
-def main():
+def execute():
     generated_nodes_count = 0
     start_time = datetime.datetime.now()
 
@@ -93,7 +105,7 @@ def main():
     zero_pos = state.index(0)
     node = Node(state, zero_pos)
 
-    print("Initial Puzzle:")
+    print_debug("Initial Puzzle:")
     print_puzzle(node.state)
 
     tree = Tree(node)
@@ -103,10 +115,10 @@ def main():
             node = tree.frontier_states.pop(0)
 
             if check_final_state(node.state):
-                print("Final Puzzle:")
+                print_debug("Final Puzzle:")
                 print_puzzle(node.state)
-                print("Lenght: ", node.distance)
-                print("Final state reached!")
+                print_debug(f"Lenght: {node.distance}")
+                print_debug("Final state reached!")
                 break
 
             generate_next_states(node, tree)
@@ -123,10 +135,28 @@ def main():
         print("Estado não resolvivel")
 
     end_time = datetime.datetime.now()
-    print("Execution Time: ", end_time - start_time)
-    print("Frontier size: ", len(tree.frontier_states))
-    print("Visited size: ", len(tree.visited_states))
-    print("Nodes generated: ", generated_nodes_count)
+    print_debug(f"Execution Time: {end_time - start_time}")
+    print_debug(f"Frontier size: {len(tree.frontier_states)}")
+    print_debug(f"Visited size: {len(tree.visited_states)}")
+    print_debug(f"Nodes generated: {generated_nodes_count}")
+
+    return end_time - start_time
 
 
-main()
+def benchmark(runs, seed=42):
+    random.seed(seed)
+    times = []
+    for i in range(runs):
+        print("Run", i + 1)
+        t = execute()
+        times.append(t.total_seconds())
+    mean_time = statistics.mean(times)
+    print("\n--- Benchmark ---")
+    print(f"Runs: {runs}")
+    print("Times (s):", [round(x, 3) for x in times])
+    print(f"Mean execution time: {mean_time:.3f} seconds")
+    return mean_time
+
+
+if __name__ == "__main__":
+    benchmark(runs=10)
