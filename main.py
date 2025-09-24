@@ -9,13 +9,13 @@ MAX_DISTANCE = 362880
 
 
 class Node:
-    def __init__(self, state, zero_pos, distance=0, heuristic=0, parent=None):
+    def __init__(self, state, zero_pos, distance=0, parent=None):
         self.state = state
         self.zero_pos = zero_pos
         self.distance = distance
-        self.heuristic = heuristic
         self.parent = parent
         self.next = None
+        self.heuristic = 0
 
 
 def is_solvable(puzzle):
@@ -65,7 +65,9 @@ def generate_next_states(node, tree):
         new_puzzle = puzzle.copy()
         new_puzzle[zero_pos], new_puzzle[new] = puzzle[new], puzzle[zero_pos]
         distance = node.distance + 1
-        next_states.append(Node(new_puzzle, new, distance, tree.heuristic_function(node), node))
+        child = Node(new_puzzle, new, distance, node)
+        child.heuristic = tree.heuristic_function(child)
+        next_states.append(child)
         # if distance > tree.path_size:
         #     print_debug(f"Level: {distance}")
         #     tree.path_size = distance

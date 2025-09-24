@@ -1,13 +1,13 @@
 heuristic,example,time_seconds
-uniform_cost,"[1, 8, 5, 7, 4, 6, 0, 3, 2]",0:00:00.062328
-difference_heuristic,"[1, 8, 5, 7, 4, 6, 0, 3, 2]",0:00:00.005386
-unnacceptable_heuristic,"[1, 8, 5, 7, 4, 6, 0, 3, 2]",0:00:03.243958
-inversion_heuristic,"[1, 8, 5, 7, 4, 6, 0, 3, 2]",0:00:00.002000
-uniform_cost,"[6, 1, 4, 0, 8, 5, 7, 3, 2]",0:00:02.809444
-difference_heuristic,"[6, 1, 4, 0, 8, 5, 7, 3, 2]",0:00:00.127173
-unnacceptable_heuristic,"[6, 1, 4, 0, 8, 5, 7, 3, 2]",0:00:04.192561
-inversion_heuristic,"[6, 1, 4, 0, 8, 5, 7, 3, 2]",0:00:00.068658
-uniform_cost,"[8, 6, 7, 2, 5, 4, 3, 0, 1]",0:00:08.131504
-difference_heuristic,"[8, 6, 7, 2, 5, 4, 3, 0, 1]",0:00:06.057179
-unnacceptable_heuristic,"[8, 6, 7, 2, 5, 4, 3, 0, 1]",0:00:05.525547
-inversion_heuristic,"[8, 6, 7, 2, 5, 4, 3, 0, 1]",0:00:00.216536
+uniform_cost,"[1, 8, 5, 7, 4, 6, 0, 3, 2]",0:00:00.068648
+difference_heuristic,"[1, 8, 5, 7, 4, 6, 0, 3, 2]",0:00:00.003282
+unnacceptable_heuristic,"[1, 8, 5, 7, 4, 6, 0, 3, 2]",0:00:06.002996
+inversion_heuristic,"[1, 8, 5, 7, 4, 6, 0, 3, 2]",0:00:00.001404
+uniform_cost,"[6, 1, 4, 0, 8, 5, 7, 3, 2]",0:00:04.305062
+difference_heuristic,"[6, 1, 4, 0, 8, 5, 7, 3, 2]",0:00:00.671971
+unnacceptable_heuristic,"[6, 1, 4, 0, 8, 5, 7, 3, 2]",0:00:08.362593
+inversion_heuristic,"[6, 1, 4, 0, 8, 5, 7, 3, 2]",0:00:00.121700
+uniform_cost,"[8, 6, 7, 2, 5, 4, 3, 0, 1]",0:00:15.777070
+difference_heuristic,"[8, 6, 7, 2, 5, 4, 3, 0, 1]",0:00:13.246353
+unnacceptable_heuristic,"[8, 6, 7, 2, 5, 4, 3, 0, 1]",0:00:09.498703
+inversion_heuristic,"[8, 6, 7, 2, 5, 4, 3, 0, 1]",0:00:00.244491
