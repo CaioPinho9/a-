@@ -98,6 +98,7 @@ class OrderedNodeList:
         self.keys = []
         self.max_key = None
         self.size = 0
+        self.max_size = 0
 
     def add(self, node):
         key = node.heuristic
@@ -110,6 +111,8 @@ class OrderedNodeList:
 
         self.buckets[key].append(node)
         self.size += 1
+        if self.size > self.max_size:
+            self.max_size = self.size
 
     def pop(self):
         if not self.buckets:
@@ -188,7 +191,7 @@ def save_txts(tree):
 examples = [
     [1, 8, 5, 7, 4, 6, 0, 3, 2],  # facil
     [6, 1, 4, 0, 8, 5, 7, 3, 2],  # medio
-    [0, 3, 8, 6, 5, 1, 7, 4, 2],  # dificil
+    [8, 6, 7, 2, 5, 4, 3, 0, 1],  # dificil
 ]
 
 heuristics = [
@@ -221,7 +224,7 @@ def execute(initial_value, heuristic):
                 end_time = datetime.datetime.now()
                 print(f"Tempo de execução (em segundos): {end_time - start_time}")
                 print(f"O total de nodos visitados: {len(tree.visited_states)}")
-                print(f"O maior tamanho da fronteira (lista de abertos): {tree.frontier_states.size}")
+                print(f"O maior tamanho da fronteira (lista de abertos): {tree.frontier_states.max_size}")
 
                 # save_txts(tree)
 
@@ -244,7 +247,7 @@ def execute(initial_value, heuristic):
 
 def benchmark(runs, seed=42):
     random.seed(seed)
-    heuristic = difference_heuristic
+    heuristic = inversion_heuristic
     times = []
     for i in range(runs):
         initial_value = generate_random_puzzle()
@@ -280,4 +283,4 @@ if __name__ == "__main__":
         writer = csv.DictWriter(f, fieldnames=["heuristic", "example", "time_seconds"])
         writer.writeheader()
         writer.writerows(rows)
-    # benchmark(runs=50)
+    # benchmark(runs=100000)
